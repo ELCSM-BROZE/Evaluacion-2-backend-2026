@@ -28,9 +28,14 @@ core/settings.py
 El entorno virtual está en .venv y las dependencias de requirements.txt se
 instalaron dentro de él.
 
+Para ejecutar localmente se usa SQLite por defecto, aunque exista un .env con
+credenciales de PostgreSQL. Para elegir PostgreSQL, configurar
+DATABASE_ENGINE=postgresql además de host, port, database, user y password.
+
 Para aplicar las migraciones:
     .venv\Scripts\python.exe manage.py migrate
 
-        .\.venv\Scripts\Activate.ps1
+Para iniciar el servidor local:
+    .\.venv\Scripts\Activate.ps1
     python manage.py migrate
     python manage.py runserver

@@ -18,11 +18,7 @@ from django.core.exceptions import ImproperlyConfigured
 
 load_dotenv()
 
-db_host = os.getenv("host")
-db_port = os.getenv("port")
-db_database = os.getenv("database")
-db_user = os.getenv("user")
-db_password = os.getenv("password")
+db_engine = os.getenv("DATABASE_ENGINE", "sqlite").strip().lower()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,9 +34,9 @@ SECRET_KEY = 'django-insecure-*hk^)&6gterr+x3jmu*+--mfiuea$yw%z7vn8ozw($^f93iahs
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'evaluacion2backend2026-ihspstdjs-back-end7.vercel.app',
+    'evaluacion-2-backend-2026.vercel.app',
     'localhost',
-    '127.0.0.1'
+    '127.0.0.1:8000'
 ]
 
 
@@ -90,9 +86,36 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 
-DATABASES = {
-    "default": (
-        {
+if db_engine == "sqlite":
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
+elif db_engine in {"postgres", "postgresql"}:
+    db_host = os.getenv("host")
+    db_port = os.getenv("port")
+    db_database = os.getenv("database")
+    db_user = os.getenv("user")
+    db_password = os.getenv("password")
+    db_missing_settings = [
+        name
+        for name, value in (
+            ("host", db_host),
+            ("port", db_port),
+            ("database", db_database),
+            ("user", db_user),
+            ("password", db_password),
+        )
+        if not value
+    ]
+    if db_missing_settings:
+        raise ImproperlyConfigured(
+            "Faltan variables para PostgreSQL: " + ", ".join(db_missing_settings)
+        )
+    DATABASES = {
+        "default": {
             "ENGINE": "django.db.backends.postgresql",
             "NAME": db_database,
             "USER": db_user,
@@ -100,19 +123,10 @@ DATABASES = {
             "HOST": db_host,
             "PORT": db_port,
         }
-        if all((db_host, db_port, db_database, db_user, db_password))
-        else {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-        if not any((db_host, db_port, db_database, db_user, db_password))
-        else None
-    )
-}
-
-if DATABASES["default"] is None:
+    }
+else:
     raise ImproperlyConfigured(
-        "Configura host, port, database, user y password para PostgreSQL."
+        "DATABASE_ENGINE debe ser 'sqlite' o 'postgresql'."
     )
 
 
