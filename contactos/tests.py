@@ -26,6 +26,22 @@ class ContactosViewsTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Ana Pérez")
 
+    def test_rutas_contactos_usan_prefijo_y_raiz_redirige(self):
+        self.assertEqual(reverse("contactos:lista_contactos"), "/contactos/")
+        self.assertEqual(reverse("contactos:crear_contacto"), "/contactos/nuevo/")
+        self.assertEqual(
+            reverse("contactos:editar_contacto", args=[self.contacto.pk]),
+            f"/contactos/{self.contacto.pk}/editar/",
+        )
+        self.assertEqual(
+            reverse("contactos:eliminar_contacto", args=[self.contacto.pk]),
+            f"/contactos/{self.contacto.pk}/eliminar/",
+        )
+
+        response = self.client.get("/")
+
+        self.assertRedirects(response, reverse("contactos:lista_contactos"))
+
     def test_busca_por_correo(self):
         response = self.client.get(
             reverse("contactos:lista_contactos"), {"q": "example.com"}
