@@ -2,4 +2,6 @@ from django.apps import AppConfig
 
 
 class ContactosConfig(AppConfig):
-    name = 'contactos'
+    default_auto_field = "django.db.models.BigAutoField"
+    name = "contactos"
+    verbose_name = "Agenda de contactos personales"

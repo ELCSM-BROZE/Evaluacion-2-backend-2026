@@ -1,0 +1,36 @@
+Cambios realizados en la aplicación contactos
+
+- Se alinearon el modelo, formulario, administración y vistas con Contacto.
+- Se corrigió el enrutamiento que apuntaba a funciones inexistentes y se añadieron
+  las rutas web para listar, buscar, crear, editar y eliminar contactos.
+- La búsqueda web y la búsqueda del admin permiten encontrar contactos por nombre
+  o correo electrónico.
+- Se añadió la acción del admin para exportar a CSV los contactos seleccionados.
+- La exportación protege valores que podrían ejecutarse como fórmulas en hojas de
+  cálculo.
+- La migración 0002 conserva el número existente al renombrarlo a teléfono y
+  añade campos de dirección y notas.
+- Se eliminaron las rutas/configuración REST Framework que no se usan y no están
+  declaradas como dependencia del proyecto.
+- Se añadieron pruebas para vistas, validación, búsqueda y exportación.
+
+Archivos modificados:
+contactos/models.py
+contactos/admin.py
+contactos/views.py
+contactos/tests.py
+contactos/forms.py
+contactos/urls.py
+contactos/migrations/0002_alter_contacto_options_remove_contacto_numero_and_more.py
+core/urls.py
+core/settings.py
+
+El entorno virtual está en .venv y las dependencias de requirements.txt se
+instalaron dentro de él.
+
+Para aplicar las migraciones:
+    .venv\Scripts\python.exe manage.py migrate
+
+        .\.venv\Scripts\Activate.ps1
+    python manage.py migrate
+    python manage.py runserver

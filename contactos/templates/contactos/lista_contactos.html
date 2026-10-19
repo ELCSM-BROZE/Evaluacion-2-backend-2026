@@ -1,0 +1,72 @@
+{% extends "contactos/base.html" %}
+
+{% block title %}Contactos | Agenda personal{% endblock %}
+
+{% block content %}
+  <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <p class="text-sm font-semibold uppercase tracking-wider text-indigo-600">Agenda personal</p>
+      <h1 class="mt-1 text-3xl font-bold tracking-tight text-slate-900">Mis contactos</h1>
+      <p class="mt-2 text-slate-600">Guarda y encuentra fácilmente los datos de las personas importantes para ti.</p>
+    </div>
+    <a class="inline-flex justify-center rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white shadow-sm transition hover:bg-indigo-700" href="{% url 'contactos:crear_contacto' %}">
+      Agregar contacto
+    </a>
+  </div>
+
+  <form method="get" class="mb-5 flex flex-col gap-2 sm:flex-row" role="search">
+    <label class="sr-only" for="busqueda-contactos">Buscar por nombre o correo electrónico</label>
+    <input id="busqueda-contactos" name="q" type="search" value="{{ consulta }}" placeholder="Buscar por nombre o correo electrónico"
+      class="min-w-0 flex-1 rounded-lg border border-slate-300 bg-white px-4 py-2 shadow-sm outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200">
+    <button class="rounded-lg bg-slate-800 px-5 py-2 font-semibold text-white transition hover:bg-slate-700" type="submit">Buscar</button>
+    {% if consulta %}
+      <a class="rounded-lg px-4 py-2 text-center font-semibold text-slate-600 transition hover:bg-slate-200" href="{% url 'contactos:lista_contactos' %}">Limpiar</a>
+    {% endif %}
+  </form>
+
+  <div class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200">
+    {% if contactos %}
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200">
+          <thead class="bg-slate-50">
+            <tr>
+              <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Nombre</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Correo electrónico</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Teléfono</th>
+              <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Localidad</th>
+              <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-slate-500">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            {% for contacto in contactos %}
+              <tr class="transition hover:bg-slate-50">
+                <td class="px-6 py-4">
+                  <p class="font-semibold text-slate-900">{{ contacto.nombre }}</p>
+                  {% if contacto.notas %}<p class="mt-1 max-w-md truncate text-sm text-slate-500">{{ contacto.notas }}</p>{% endif %}
+                </td>
+                <td class="whitespace-nowrap px-6 py-4 text-slate-700">{{ contacto.email|default:"—" }}</td>
+                <td class="whitespace-nowrap px-6 py-4 text-slate-700">{{ contacto.telefono|default:"—" }}</td>
+                <td class="whitespace-nowrap px-6 py-4 text-slate-700">{{ contacto.localidad|default:"—" }}</td>
+                <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-semibold">
+                  <a class="text-indigo-600 hover:text-indigo-800" href="{% url 'contactos:editar_contacto' contacto.pk %}">Editar</a>
+                  <a class="ml-4 text-rose-600 hover:text-rose-800" href="{% url 'contactos:eliminar_contacto' contacto.pk %}">Eliminar</a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="px-6 py-16 text-center">
+        {% if consulta %}
+          <p class="text-lg font-semibold text-slate-800">No se encontraron contactos.</p>
+          <p class="mt-2 text-slate-500">Prueba con otro nombre o correo electrónico.</p>
+        {% else %}
+          <p class="text-lg font-semibold text-slate-800">Aún no hay contactos registrados.</p>
+          <p class="mt-2 text-slate-500">Agrega el primero para comenzar a organizar tu agenda.</p>
+          <a class="mt-6 inline-flex rounded-lg bg-indigo-600 px-4 py-2 font-semibold text-white transition hover:bg-indigo-700" href="{% url 'contactos:crear_contacto' %}">Crear contacto</a>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}
