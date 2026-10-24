@@ -49,6 +49,20 @@ class ContactosViewsTests(TestCase):
 
         self.assertContains(response, "Ana Pérez")
 
+    def test_lista_contactos_paginacion(self):
+        for index in range(11):
+            Contacto.objects.create(
+                nombre=f"Contacto {index}",
+                email=f"contacto{index}@example.com",
+            )
+
+        response = self.client.get(reverse("contactos:lista_contactos"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Página 1 de 2")
+        self.assertContains(response, "Siguiente")
+        self.assertEqual(response.context["contactos"].paginator.num_pages, 2)
+
     def test_crea_contacto(self):
         response = self.client.post(
             reverse("contactos:crear_contacto"),

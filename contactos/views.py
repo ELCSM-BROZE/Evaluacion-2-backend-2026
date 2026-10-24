@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.core.paginator import Paginator
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -14,10 +15,14 @@ def lista_contactos(request):
             Q(nombre__icontains=consulta) | Q(email__icontains=consulta)
         )
 
+    paginator = Paginator(contactos, 10)
+    pagina = request.GET.get("page")
+    contactos_paginados = paginator.get_page(pagina)
+
     return render(
         request,
         "contactos/lista_contactos.html",
-        {"contactos": contactos, "consulta": consulta},
+        {"contactos": contactos_paginados, "consulta": consulta},
     )
 
 

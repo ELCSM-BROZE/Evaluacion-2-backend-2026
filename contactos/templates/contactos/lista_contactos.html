@@ -56,6 +56,20 @@
           </tbody>
         </table>
       </div>
+
+      {% if contactos.has_other_pages %}
+        <div class="flex items-center justify-between border-t border-slate-200 px-6 py-4 text-sm text-slate-600">
+          <span>Página {{ contactos.number }} de {{ contactos.paginator.num_pages }}</span>
+          <div class="flex items-center gap-2">
+            {% if contactos.has_previous %}
+              <a class="rounded-lg border border-slate-200 px-3 py-1.5 font-medium hover:bg-slate-100" href="?page={{ contactos.previous_page_number }}{% if consulta %}&q={{ consulta }}{% endif %}">Anterior</a>
+            {% endif %}
+            {% if contactos.has_next %}
+              <a class="rounded-lg border border-slate-200 px-3 py-1.5 font-medium hover:bg-slate-100" href="?page={{ contactos.next_page_number }}{% if consulta %}&q={{ consulta }}{% endif %}">Siguiente</a>
+            {% endif %}
+          </div>
+        </div>
+      {% endif %}
     {% else %}
       <div class="px-6 py-16 text-center">
         {% if consulta %}

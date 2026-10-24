@@ -27,17 +27,46 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-*hk^)&6gterr+x3jmu*+--mfiuea$yw%z7vn8ozw($^f93iahs'
+SECRET_KEY = os.getenv(
+    "SECRET_KEY",
+    "django-insecure-*hk^)&6gterr+x3jmu*+--mfiuea$yw%z7vn8ozw($^f93iahs",
+)
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "True").strip().lower() in {"1", "true", "yes", "on"}
 
-ALLOWED_HOSTS = [
+allowed_hosts = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,0.0.0.0")
+ALLOWED_HOSTS = [host.strip() for host in allowed_hosts.split(",") if host.strip()]
+ALLOWED_HOSTS.extend([
     'evaluacion-2-backend-2026.vercel.app',
     'localhost',
-    '127.0.0.1:8000'
-]
+    '127.0.0.1',
+    '127.0.0.1:8000',
+    '0.0.0.0',
+    'testserver',
+    '.vercel.app',
+])
+vercel_host = os.getenv("VERCEL_URL")
+if vercel_host:
+    ALLOWED_HOSTS.append(vercel_host)
+    ALLOWED_HOSTS.append(f"*.{vercel_host}")
+ALLOWED_HOSTS = list(dict.fromkeys(ALLOWED_HOSTS))
+
+CSRF_TRUSTED_ORIGINS = []
+for host in ALLOWED_HOSTS:
+    if host.startswith("."):
+        CSRF_TRUSTED_ORIGINS.append(f"https://{host.lstrip('.')}" )
+    elif host and host not in {"localhost", "127.0.0.1", "0.0.0.0", "testserver"}:
+        CSRF_TRUSTED_ORIGINS.append(f"https://{host}")
+        CSRF_TRUSTED_ORIGINS.append(f"http://{host}")
+
+if vercel_host:
+    CSRF_TRUSTED_ORIGINS.extend([
+        f"https://{vercel_host}",
+        f"http://{vercel_host}",
+    ])
+CSRF_TRUSTED_ORIGINS = list(dict.fromkeys(origin for origin in CSRF_TRUSTED_ORIGINS if origin))
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 
 # Application definition
@@ -165,13 +194,19 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+os.makedirs(STATIC_ROOT, exist_ok=True)
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
-MAILERS = {
-    'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
-    },
-}
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

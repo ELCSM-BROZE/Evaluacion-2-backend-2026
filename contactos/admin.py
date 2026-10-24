@@ -53,4 +53,11 @@ class ContactoAdmin(admin.ModelAdmin):
     list_filter = ("activo", "localidad")
     search_fields = ("nombre", "email")
     ordering = ("nombre", "pk")
+    list_per_page = 10
     actions = (exportar_contactos_csv,)
+
+    def changelist_view(self, request, extra_context=None):
+        self.admin_site.site_header = "Agenda personal"
+        self.admin_site.site_title = "Agenda personal"
+        self.admin_site.index_title = "Administración de contactos"
+        return super().changelist_view(request, extra_context=extra_context)
